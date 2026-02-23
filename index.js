@@ -72,6 +72,7 @@ function createSetupWindow() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
+            sandbox: false,
             preload: preloadPath,
         },
         title: 'CloudTAK Setup',
@@ -137,6 +138,7 @@ function createMainWindow(url) {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
+            sandbox: false,
             backgroundThrottling: false,
             preload: preloadPath,
         },
@@ -152,6 +154,14 @@ function createMainWindow(url) {
         } else {
             callback(false);
         }
+    });
+
+    // Strip response headers that can block page loads inside Electron
+    mainWindow.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+        const responseHeaders = Object.assign({}, details.responseHeaders);
+        delete responseHeaders['X-Frame-Options'];
+        delete responseHeaders['x-frame-options'];
+        callback({ responseHeaders });
     });
 
     const template = [
