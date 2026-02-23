@@ -12,6 +12,10 @@
 
 ### Pending Release
 
+### v1.0.4
+
+- :bug Turn off sandboxing in built app
+
 ### v1.0.3
 
 - :rocket Update GH Release
