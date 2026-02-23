@@ -1,25 +1,116 @@
-name: NPM Release
+name: Release
 
 on:
   push:
     tags:
       - '*'
+  release:
+    types: [published, created]
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  create_release:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Get tag
+      - name: Resolve tag
         id: tag
-        uses: dawidd6/action-get-tag@v1
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tag=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Generate CHANGELOG
-        run: grep -Pzo "### ${{steps.tag.outputs.tag}}(?s).*?(?=###)" CHANGELOG.md > RELEASE
+        run: |
+          grep -Pzo "### ${{ steps.tag.outputs.tag }}(?s).*?(?=###)" CHANGELOG.md > RELEASE
 
-      - name: Github Release
+      - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           body_path: RELEASE
+          tag_name: ${{ steps.tag.outputs.tag }}
+
+  build:
+    needs: create_release
+    name: Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            build_args: "--linux"
+            release_globs: |
+              dist/*.AppImage
+              dist/*.deb
+              dist/*linux*.yml
+          - os: macos-latest
+            platform: macos
+            build_args: "--mac"
+            release_globs: |
+              dist/*.dmg
+              dist/*mac*.yml
+          - os: windows-latest
+            platform: windows
+            build_args: "--win"
+            release_globs: |
+              dist/*.exe
+              dist/*.yml
+
+    env:
+      TAG: ${{ needs.create_release.outputs.tag }}
+
+    steps:
+      - name: Checkout release
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            setup-ui/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install setup UI dependencies
+        working-directory: setup-ui
+        run: npm ci
+
+      - name: Build setup UI assets
+        run: npm run build --prefix setup-ui
+
+      - name: Build ${{ matrix.platform }} package
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder ${{ matrix.build_args }} --publish never
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-dist
+          path: |
+            ${{ matrix.release_globs }}
+          if-no-files-found: error
+
+      - name: Attach artifacts to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.release_globs }}
+          tag_name: ${{ env.TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
