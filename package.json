@@ -1,6 +1,6 @@
 {
     "name": "@tak-ps/cloudtak-desktop",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "CloudTAK Desktop Application",
     "main": "index.js",
     "scripts": {
