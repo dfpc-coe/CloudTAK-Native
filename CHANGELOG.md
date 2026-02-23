@@ -12,6 +12,10 @@
 
 ### Pending Release
 
+### v1.0.1
+
+- :rocket Update GH Release
+
 ### v1.0.0
 
 - :tada: Initial Release
