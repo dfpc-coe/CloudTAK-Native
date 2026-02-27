@@ -98,15 +98,18 @@
                                             icon='server'
                                             label='Server URL'
                                             placeholder='https://cloudtak.example.com'
+                                            :error='validationError'
                                             @keyup.enter='saveUrl'
                                         />
                                     </div>
                                     <div class='form-footer d-grid gap-2'>
                                         <button
                                             class='btn btn-primary w-100'
+                                            :disabled='validating'
                                             @click='saveUrl'
                                         >
-                                            Connect
+                                            <span v-if='validating'>Validating...</span>
+                                            <span v-else>Connect</span>
                                         </button>
                                         <button
                                             class='btn btn-link'
@@ -156,6 +159,8 @@ const searchTerm = ref('')
 const loading = ref(false)
 const error = ref<Error | null>(null)
 const viewMode = ref<'providers' | 'manual'>('providers')
+const validating = ref(false)
+const validationError = ref<string | null>(null)
 
 const filteredProviders = computed(() => {
     const term = searchTerm.value.trim().toLowerCase()
@@ -189,19 +194,50 @@ function pickProvider(url: string) {
     saveUrl()
 }
 
-function saveUrl() {
-    if (serverUrl.value) {
-        // @ts-ignore
-        if (window.electronAPI && window.electronAPI.saveUrl) {
-            // @ts-ignore
-            window.electronAPI.saveUrl(serverUrl.value)
-        } else {
-            // Fallback for older IPC or if contextIsolation is false
-            const { ipcRenderer } = require('electron')
-            ipcRenderer.send('save-url', serverUrl.value)
-        }
-    } else {
+async function validateServer(url: string): Promise<void> {
+    const base = url.replace(/\/$/, '')
+    const response = await fetch(`${base}/api`)
+    if (!response.ok) throw new Error(`Server responded with status ${response.status}`)
+    const data = await response.json()
+    const version = data?.version
+    if (!version) throw new Error('Server did not return a version')
+    const match = String(version).match(/^v?(\d+)/)
+    if (!match) throw new Error(`Unable to parse version: ${version}`)
+    const major = parseInt(match[1], 10)
+    if (major < 12) throw new Error(`Server version ${version} is not supported. Version v12 or higher is required.`)
+}
+
+async function saveUrl() {
+    if (!serverUrl.value) {
         alert('Please enter a valid URL')
+        return
+    }
+
+    if (!/^https?:\/\//i.test(serverUrl.value)) {
+        serverUrl.value = `https://${serverUrl.value}`
+    }
+
+    validating.value = true
+    validationError.value = null
+
+    try {
+        await validateServer(serverUrl.value)
+    } catch (err) {
+        validationError.value = err instanceof Error ? err.message : 'Failed to validate server'
+        validating.value = false
+        return
+    }
+
+    validating.value = false
+
+    // @ts-ignore
+    if (window.electronAPI && window.electronAPI.saveUrl) {
+        // @ts-ignore
+        window.electronAPI.saveUrl(serverUrl.value)
+    } else {
+        // Fallback for older IPC or if contextIsolation is false
+        const { ipcRenderer } = require('electron')
+        ipcRenderer.send('save-url', serverUrl.value)
     }
 }
 

@@ -12,21 +12,27 @@
 
 ### Pending Release
 
+- :tada: Automatic version checking via GitHub Releases on startup and via Help menu
+
+### v1.1.0
+
+- :rocket: Allow force reloading app from menu
+
 ### v1.0.4
 
-- :bug Turn off sandboxing in built app
+- :bug: Turn off sandboxing in built app
 
 ### v1.0.3
 
-- :rocket Update GH Release
+- :rocket: Update GH Release
 
 ### v1.0.2
 
-- :rocket Update GH Release
+- :rocket: Update GH Release
 
 ### v1.0.1
 
-- :rocket Update GH Release
+- :rocket: Update GH Release
 
 ### v1.0.0
 
