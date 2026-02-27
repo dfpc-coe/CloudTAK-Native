@@ -98,6 +98,23 @@ ipcMain.on('save-url', (_event, url) => {
     void handleSaveUrl(url);
 });
 
+ipcMain.on('reset-app', (_event) => {
+    void handleResetApp();
+});
+
+async function handleResetApp() {
+    const targetSession = mainWindow ? mainWindow.webContents.session : session.defaultSession;
+    await clearWebContext(targetSession);
+    if (mainWindow && currentServerUrl) {
+        mainWindow.loadURL(currentServerUrl).catch((err) => {
+            dialog.showErrorBox('Error reloading', `Failed to reload ${currentServerUrl}: ${err.message}`);
+            createSetupWindow();
+        });
+    } else {
+        createSetupWindow();
+    }
+}
+
 async function handleSaveUrl(url) {
     const targetUrl = (url || '').trim();
     if (!targetUrl) return;
@@ -172,6 +189,12 @@ function createMainWindow(url) {
                     label: 'Change Server URL',
                     click: () => {
                         createSetupWindow();
+                    }
+                },
+                {
+                    label: 'Reset App',
+                    click: () => {
+                        void handleResetApp();
                     }
                 },
                 { type: 'separator' },
