@@ -249,6 +249,10 @@ function createMainWindow(url) {
 }
 
 app.on('ready', () => {
+    if (app.dock) {
+        app.dock.setIcon(iconPath);
+    }
+
     const config = loadConfig();
     currentServerUrl = config.serverUrl || '';
     if (config.serverUrl) {
