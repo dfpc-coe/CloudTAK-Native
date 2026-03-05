@@ -4,6 +4,7 @@
     "description": "CloudTAK Desktop Application",
     "main": "index.js",
     "scripts": {
+        "prestart": "npm run build:setup-ui",
         "start": "electron . --no-sandbox",
         "build:setup-ui": "cd setup-ui && npm install && npm run build",
         "build": "npm run build:setup-ui && electron-builder -mwl",
