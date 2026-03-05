@@ -8,6 +8,11 @@
         "start": "electron . --no-sandbox",
         "build:setup-ui": "cd setup-ui && npm install && npm run build",
         "build": "npm run build:setup-ui && electron-builder -mwl",
+        "cap:sync": "npm run build:setup-ui && npx cap sync",
+        "cap:ios": "npm run cap:sync && npx cap open ios",
+        "cap:android": "npm run cap:sync && npx cap open android",
+        "cap:run:ios": "npm run cap:sync && npx cap run ios",
+        "cap:run:android": "npm run cap:sync && npx cap run android",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "build": {
@@ -43,10 +48,17 @@
     "license": "AGPL",
     "type": "commonjs",
     "devDependencies": {
+        "@capacitor/cli": "^7.0.0",
         "electron": "^40.6.0",
         "electron-builder": "^26.8.1"
     },
     "dependencies": {
+        "@capacitor/android": "^7.0.0",
+        "@capacitor/browser": "^7.0.0",
+        "@capacitor/core": "^7.0.0",
+        "@capacitor/ios": "^7.0.0",
+        "@capacitor/preferences": "^7.0.0",
+        "@capacitor-community/keep-awake": "^6.0.0",
         "electron-serve": "^3.0.1"
     }
 }

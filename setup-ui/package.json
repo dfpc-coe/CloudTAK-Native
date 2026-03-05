@@ -9,6 +9,10 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@capacitor/browser": "^7.0.0",
+        "@capacitor/core": "^7.0.0",
+        "@capacitor/preferences": "^7.0.0",
+        "@capacitor-community/keep-awake": "^6.0.0",
         "@tabler/core": "^1.4.0",
         "@tak-ps/vue-tabler": "^4.6.0",
         "@types/showdown": "^2.0.6",
