@@ -11,6 +11,7 @@
     "dependencies": {
         "@capacitor/browser": "^7.0.0",
         "@capacitor/core": "^7.0.0",
+        "@capacitor/geolocation": "^7.0.0",
         "@capacitor/preferences": "^7.0.0",
         "@capacitor-community/keep-awake": "^6.0.0",
         "@tabler/core": "^1.4.0",
