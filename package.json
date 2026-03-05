@@ -48,18 +48,19 @@
     "license": "AGPL",
     "type": "commonjs",
     "devDependencies": {
-        "@capacitor/cli": "^7.0.0",
+        "@capacitor/cli": "^8.1.0",
         "electron": "^40.6.0",
-        "electron-builder": "^26.8.1"
+        "electron-builder": "^26.8.1",
+        "typescript": "^5.9.3"
     },
     "dependencies": {
-        "@capacitor/android": "^7.0.0",
-        "@capacitor/browser": "^7.0.0",
-        "@capacitor/core": "^7.0.0",
-        "@capacitor/geolocation": "^7.0.0",
-        "@capacitor/ios": "^7.0.0",
-        "@capacitor/preferences": "^7.0.0",
-        "@capacitor-community/keep-awake": "^6.0.0",
+        "@capacitor-community/keep-awake": "^8.0.0",
+        "@capacitor/android": "^8.1.0",
+        "@capacitor/browser": "^8.0.1",
+        "@capacitor/core": "^8.1.0",
+        "@capacitor/geolocation": "^8.1.0",
+        "@capacitor/ios": "^8.1.0",
+        "@capacitor/preferences": "^8.0.1",
         "electron-serve": "^3.0.1"
     }
 }
