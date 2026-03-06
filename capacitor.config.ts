@@ -6,6 +6,7 @@ const config: CapacitorConfig = {
     webDir: 'dist-setup',
     server: {
         androidScheme: 'https',
+        allowNavigation: ['*'],
     },
     plugins: {
         Browser: {
