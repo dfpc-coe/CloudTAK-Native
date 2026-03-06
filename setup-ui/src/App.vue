@@ -139,6 +139,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { TablerAlert, TablerInput, TablerLoading, TablerNone } from '@tak-ps/vue-tabler'
+import { Capacitor } from '@capacitor/core'
+import { Preferences } from '@capacitor/preferences'
 import logo from './assets/CloudTAKLogo.svg'
 
 type ProviderLogo = {
@@ -230,18 +232,38 @@ async function saveUrl() {
 
     validating.value = false
 
+    if (Capacitor.isNativePlatform()) {
+        // Running inside Capacitor (Android/iOS) – persist the URL and navigate
+        // the WebView to the remote PWA, mirroring the Electron behaviour.
+        await Preferences.set({ key: 'serverUrl', value: serverUrl.value })
+        window.location.href = serverUrl.value
     // @ts-ignore
-    if (window.electronAPI && window.electronAPI.saveUrl) {
+    } else if (window.electronAPI && window.electronAPI.saveUrl) {
         // @ts-ignore
         window.electronAPI.saveUrl(serverUrl.value)
     } else {
-        // Fallback for older IPC or if contextIsolation is false
-        const { ipcRenderer } = require('electron')
-        ipcRenderer.send('save-url', serverUrl.value)
+        try {
+            // Fallback for older IPC or if contextIsolation is false
+            const { ipcRenderer } = require('electron')
+            ipcRenderer.send('save-url', serverUrl.value)
+        } catch {
+            // Not in Electron either – just redirect
+            window.location.href = serverUrl.value
+        }
     }
 }
 
-onMounted(() => {
+onMounted(async () => {
+    // If running in Capacitor and a server URL was previously saved, navigate
+    // straight to the remote PWA (same behaviour as the Electron app).
+    if (Capacitor.isNativePlatform()) {
+        const { value } = await Preferences.get({ key: 'serverUrl' })
+        if (value) {
+            window.location.href = value
+            return
+        }
+    }
+
     loadProviders()
 })
 </script>
