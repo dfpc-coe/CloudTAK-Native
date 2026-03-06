@@ -9,6 +9,11 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@capacitor/browser": "^8.0.1",
+        "@capacitor/core": "^8.1.0",
+        "@capacitor/geolocation": "^8.1.0",
+        "@capacitor/preferences": "^8.0.1",
+        "@capacitor-community/keep-awake": "^8.0.0",
         "@tabler/core": "^1.4.0",
         "@tak-ps/vue-tabler": "^4.6.0",
         "@types/showdown": "^2.0.6",
@@ -18,13 +23,13 @@
     "devDependencies": {
         "@types/node": "^25.0.0",
         "@vitejs/plugin-vue": "^6.0.2",
-        "@vue/tsconfig": "^0.8.1",
+        "@vue/tsconfig": "^0.9.0",
         "typescript": "~5.9.3",
-        "vite": "^8.0.0-beta.13",
+        "vite": "^8.0.0-beta.16",
         "vue-tsc": "^3.1.5"
     },
     "overrides": {
-        "vite": "^8.0.0-beta.13"
+        "vite": "^8.0.0-beta.16"
     },
     "description": "This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.",
     "main": "index.js",
